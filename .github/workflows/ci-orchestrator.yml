@@ -3,6 +3,10 @@ name: CI Orchestrator
 
 on:
   workflow_call:
+    outputs:
+      all_packages:
+        description: "JSON array of all detected packages (for the caller to gate deploy)"
+        value: ${{ jobs.detect.outputs.all_packages }}
     secrets:
       GH_PAT:
         required: true
