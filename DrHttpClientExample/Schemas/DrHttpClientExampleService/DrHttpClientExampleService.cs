@@ -41,7 +41,7 @@ namespace BPMSoft.Configuration.DrAcula
             RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         public async Task<string> TestAntiPatternAsync(string endpoint)
         {
-            string result    = await AntiPatternHttpClient.ExecuteAsync(endpoint);
+            string result = await AntiPatternHttpClient.ExecuteAsync(endpoint);
             return result;
         }
 
