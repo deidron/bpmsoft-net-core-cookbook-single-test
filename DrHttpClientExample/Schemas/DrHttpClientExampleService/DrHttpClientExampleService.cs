@@ -13,7 +13,6 @@ namespace BPMSoft.Configuration.DrAcula
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Required)]
     public class DrHttpClientExampleService : BaseService
     {
-
         private IDrHttpClientExample DefaultHttpClient { get; } = ClassFactory.Get<IDrHttpClientExample>("Default");
 
         private IDrHttpClientExample AntiPatternHttpClient { get; } = ClassFactory.Get<IDrHttpClientExample>("AntiPattern");
@@ -21,38 +20,25 @@ namespace BPMSoft.Configuration.DrAcula
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped,
             RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public async Task<string> TestAsync(string endpoint)
-        {
-            string result = await DefaultHttpClient.ExecuteAsync(endpoint); ;
-            return result;
-        }
+        public Task<string> TestAsync(string endpoint) =>
+            DefaultHttpClient.ExecuteAsync(endpoint);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped,
             RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public string Test(string endpoint)
-        {
-            string result = DefaultHttpClient.Execute(endpoint); ;
-            return result;
-        }
+        public string Test(string endpoint) =>
+            DefaultHttpClient.Execute(endpoint);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped,
             RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public async Task<string> TestAntiPatternAsync(string endpoint)
-        {
-            string result = await AntiPatternHttpClient.ExecuteAsync(endpoint);
-            return result;
-        }
+        public Task<string> TestAntiPatternAsync(string endpoint) =>
+            AntiPatternHttpClient.ExecuteAsync(endpoint);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped,
             RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        public string TestAntiPattern(string endpoint)
-        {
-            string result = AntiPatternHttpClient.Execute(endpoint);
-            return result;
-        }
+        public string TestAntiPattern(string endpoint) =>
+            AntiPatternHttpClient.Execute(endpoint);
     }
-
 }
