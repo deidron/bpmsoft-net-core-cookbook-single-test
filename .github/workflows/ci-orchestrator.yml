@@ -54,7 +54,15 @@ jobs:
   pack:
     name: Pack
     needs: [detect, format-schema, build]
-    if: needs.detect.outputs.all_packages != '[]'
+    # format & build are SKIPPED for schema-only packages (no code project). A skipped
+    # need would normally skip pack too, so use !cancelled() to run anyway — while still
+    # bailing out if detect didn't succeed or an upstream actually failed.
+    if: >-
+      ${{ !cancelled()
+      && needs.detect.result == 'success'
+      && needs.detect.outputs.all_packages != '[]'
+      && needs.build.result != 'failure'
+      && needs.format-schema.result != 'failure' }}
     uses: ./.github/workflows/job-pack.yml
     with:
       packages: ${{ needs.detect.outputs.all_packages }}
