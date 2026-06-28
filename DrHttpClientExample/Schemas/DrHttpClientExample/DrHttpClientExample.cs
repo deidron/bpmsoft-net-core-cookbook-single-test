@@ -11,13 +11,12 @@ namespace BPMSoft.Configuration.DrAcula
     [DefaultBinding(typeof(IDrHttpClientExample), Name = "Default")]
     public class DrHttpClientExample(IHttpClientFactory httpClientFactory) : IDrHttpClientExample
     {
-
-        readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
         private readonly ILog _logger = LogManager.GetLogger(nameof(DrHttpClientExample));
 
         public string Execute(string endpoint) =>
-            AsyncPump.Run(async () => await ExecuteAsync(endpoint));
+            AsyncPump.Run(() => ExecuteAsync(endpoint));
 
         public Task<string> ExecuteAsync(string endpoint) =>
             ExecuteAsync(endpoint, CancellationToken.None);
@@ -30,17 +29,25 @@ namespace BPMSoft.Configuration.DrAcula
                 using (HttpResponseMessage response = await client.GetAsync(endpoint, cancellationToken))
                 {
                     if (response.IsSuccessStatusCode)
+#if NET5_0_OR_GREATER
                         return await response.Content.ReadAsStringAsync(cancellationToken);
-                    _logger.Error($"Server returned an error: {response.StatusCode}");
+#else
+                        return await response.Content.ReadAsStringAsync();
+#endif
+                    _logger.Error($"Server returned an error {response.StatusCode} for {endpoint}");
                     return null;
                 }
             }
-            catch (Exception ex) when (ex is HttpRequestException || ex is OperationCanceledException)
+            catch (HttpRequestException ex)
             {
-                _logger.Error(ex);
+                _logger.Error($"Request to {endpoint} failed", ex);
+                return null;
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                _logger.Error($"Request to {endpoint} timed out");
                 return null;
             }
         }
-
     }
 }
